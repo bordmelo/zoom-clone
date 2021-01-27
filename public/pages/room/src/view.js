@@ -47,8 +47,8 @@ class View {
   }
 
   setParticipants(count) {
-    const myself = 0;
+    const myself = 1;
     const participants = document.getElementById('participants');
-    participants.innerHTML(count + myself);
+    participants.innerHTML = (count + myself);
   }
 }

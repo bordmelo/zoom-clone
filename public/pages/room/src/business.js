@@ -7,8 +7,8 @@ class Business {
     this.socketBuilder = socketBuilder;
     this.peerBuilder = peerBuilder;
 
-    this.currentStream = {}
     this.socket = {}
+    this.currentStream = {}
     this.currentPeer = {}
     
     this.peers = new Map();
@@ -20,6 +20,8 @@ class Business {
   }
 
   async _init() {
+    this.currentStream = await this.media.getCamera();
+
     this.socket = this.socketBuilder
       .setOnUserConnected(this.onUserConnected())
       .setOnUserDisconnected(this.onUserDisconnected())
@@ -32,9 +34,7 @@ class Business {
       .setOnPeerStreamReceived(this.onPeerStreamReceived())
       .build()
 
-    this.currentStream = await this.media.getCamera();
-
-    this.addVideoStream('Melo Sharingan');
+    this.addVideoStream('Clone das Sombras');
   }
 
   addVideoStream(userId, stream = this.currentStream) {
@@ -89,6 +89,7 @@ class Business {
       const callerId = call.peer;
       this.addVideoStream(callerId, stream);
       this.peers.set(callerId, { call });
+      console.log(this.peers)
       this.view.setParticipants(this.peers.size);
     }
   }
