@@ -32,9 +32,11 @@ class Business {
       .setOnConnectionOpened(this.onPeerConnectionOpened())
       .setOnCallReceived(this.onPeerCallReceived())
       .setOnPeerStreamReceived(this.onPeerStreamReceived())
+      .setOnCallError(this.onPeerCallError())
+      .setOnCallClose(this.onPeerCallClose())
       .build()
 
-    this.addVideoStream('Clone das Sombras');
+    this.addVideoStream(this.currentPeer.id);
   }
 
   addVideoStream(userId, stream = this.currentStream) {
@@ -47,26 +49,34 @@ class Business {
     });
   }
 
-  onUserConnected = function() {
+  onUserConnected() {
     return userId => {
       console.log('user connected!', userId);
       this.currentPeer.call(userId, this.currentStream);
     }
   }
   
-  onUserDisconnected = function() {
+  onUserDisconnected() {
     return userId => {
       console.log('user disconnected!', userId);
+
+      if(this.peers.has(userId)) {
+        this.peers.get(userId).call.close();
+        this.peers.delete(userId);
+      }
+
+      this.view.setParticipants(this.peers.size);
+      this.view.removeVideoElement(userId);
     }
   }
 
-  onPeerError = function () {
+  onPeerError() {
     return error => {
       console.error('error on peer!', error)
     }
   }
 
-  onPeerConnectionOpened = function () {
+  onPeerConnectionOpened() {
     return (peer) => {
       const id = peer.id;
 
@@ -76,7 +86,7 @@ class Business {
     }
   }
 
-  onPeerCallReceived = function () {
+  onPeerCallReceived() {
     return call => {
       console.log('answering call', call);
 
@@ -84,13 +94,26 @@ class Business {
     }
   }
 
-  onPeerStreamReceived = function () {
+  onPeerStreamReceived() {
     return (call, stream) => {
       const callerId = call.peer;
       this.addVideoStream(callerId, stream);
       this.peers.set(callerId, { call });
       console.log(this.peers)
       this.view.setParticipants(this.peers.size);
+    }
+  }
+
+  onPeerCallError() {
+    return (call, error) => {
+      console.error('an call error ocurred!', error);
+      this.view.removeVideoElement(call.peer);
+    }
+  }
+
+  onPeerCallClose() {
+    return (call) => {
+      console.error('call closed!', call.peer);
     }
   }
 }
