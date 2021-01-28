@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx peerjs --port 9000 --key peerjs --path /",
+    "start": "npx peerjs --port $PORT --key peerjs --path /",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
